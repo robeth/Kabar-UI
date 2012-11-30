@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Kabar UI</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="category1">Acara Kampus</string>
+    <string name="category2">Beasiswa dan Lowongan</string>
+    <string name="category3">Lomba dan Prestasi</string>
+    <string name="category4">Santai</string>
+
+</resources>
