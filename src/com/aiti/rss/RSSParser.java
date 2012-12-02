@@ -37,6 +37,7 @@ public class RSSParser {
 	private static String TAG_ITEM = "item";
 	private static String TAG_PUB_DATE = "pubDate";
 	private static String TAG_GUID = "guid";
+	private static String TAG_CREATOR = "dc:creator";
 
 	// constructor
 	public RSSParser() {
@@ -126,8 +127,9 @@ public class RSSParser {
 					String description = this.getValue(e1, TAG_DESRIPTION);
 					String pubdate = this.getValue(e1, TAG_PUB_DATE);
 					String guid = this.getValue(e1, TAG_GUID);
+					String creator = this.getValue(e1, TAG_CREATOR);
 					
-					RSSItem rssItem = new RSSItem(title, link, description, pubdate, guid);
+					RSSItem rssItem = new RSSItem(title, link, description, pubdate, guid, creator);
 					
 					// adding item to list
 					itemsList.add(rssItem);

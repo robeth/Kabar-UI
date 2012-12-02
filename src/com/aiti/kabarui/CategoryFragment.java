@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -28,11 +31,33 @@ public class CategoryFragment extends Fragment {
 	String rss_link;
 	ListView list;
 	RelativeLayout waitLayout;
+	
+	
+	public static final int CATEGORY_ACARA = 0;
+	public static final int CATEGORY_BEASISWA = 1;
+	public static final int CATEGORY_LOMBA = 2;
+	public static final int CATEGORY_SANTAI= 3;
+	
+	private static final String[] ANAKUI_LINKS = {
+		"http://www.anakui.com/category/acara-kampus/feed/",
+		"http://www.anakui.com/category/beasiswa-lowongan/feed/",
+		"http://www.anakui.com/category/lomba-prestasi/feed/",
+		"http://www.anakui.com/category/santai/feed/"
+	};
+	private int category;
+	
+	
+	
+	public CategoryFragment(int category) {
+		super();
+		this.category = category;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		rss_link = "http://www.anakui.com/category/beasiswa-lowongan/feed/";
+		
+		rss_link = ANAKUI_LINKS[this.category];
 	}
 
 	@Override
@@ -82,6 +107,24 @@ public class CategoryFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     list.setAdapter(new NewsAdapter(CategoryFragment.this.getActivity(),rssItems));
+                    list.setOnItemClickListener(new OnItemClickListener(){
+
+						@Override
+						public void onItemClick(AdapterView<?> arg0, View arg1,
+								int arg2, long arg3) {
+							// TODO Auto-generated method stub
+							Intent i = new Intent(CategoryFragment.this.getActivity(), NewsActivity.class);
+							i.putExtra("title", rssItems.get(arg2).getTitle());
+							i.putExtra("creator", rssItems.get(arg2).getCreator());
+							i.putExtra("pubdate", rssItems.get(arg2).getPubdate());
+							i.putExtra("link", rssItems.get(arg2).getLink());
+							i.putExtra("description", rssItems.get(arg2).getDescription());
+							CategoryFragment.this.getActivity().startActivity(i);
+						}
+
+						
+                    	
+                    });
                 }
             });
             return null;

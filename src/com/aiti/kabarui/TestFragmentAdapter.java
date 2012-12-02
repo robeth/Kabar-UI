@@ -25,7 +25,7 @@ class TestFragmentAdapter extends FragmentPagerAdapter implements IconPagerAdapt
     	if(position == 0)
     		return new HomeFragment();
     	else
-    		return new CategoryFragment();
+    		return new CategoryFragment(position-1);
     }
 
     @Override
