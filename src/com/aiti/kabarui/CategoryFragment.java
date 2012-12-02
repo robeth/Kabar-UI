@@ -1,75 +1,99 @@
 package com.aiti.kabarui;
- 
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
- 
+import android.widget.RelativeLayout;
+
+import com.aiti.rss.RSSFeed;
+import com.aiti.rss.RSSItem;
+import com.aiti.rss.RSSParser;
+
 public class CategoryFragment extends Fragment {
-    static final String KEY_ID = "id";
-    static final String KEY_TITLE = "title";
-    static final String KEY_ARTIST = "artist";
-    static final String KEY_DURATION = "duration";
- 
-    ListView list;
-    NewsAdapter adapter;
- 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-    }
+	
+	private ProgressDialog pDialog;
+	ArrayList<HashMap<String, String>> rssItemList = new ArrayList<HashMap<String, String>>();
+	RSSParser rssParser = new RSSParser();
+	List<RSSItem> rssItems = new ArrayList<RSSItem>();
+	RSSFeed rssFeed;
+	String rss_link;
+	ListView list;
+	RelativeLayout waitLayout;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		rss_link = "http://www.anakui.com/category/beasiswa-lowongan/feed/";
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		View v = inflater.inflate(R.layout.category, container,false);
-		 
-        ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+		View v = inflater.inflate(R.layout.category, container, false);
+
+		
+		list = (ListView) v.findViewById(R.id.list_berita);
+		waitLayout = (RelativeLayout) v.findViewById(R.id.wait_layout);
+		new loadRSSFeedItems().execute(rss_link);
+		// Getting adapter by passing xml data ArrayList
+		return v;
+	}
+	
+	/**
+     * Background Async Task to get RSS Feed Items data from URL
+     * */
+    class loadRSSFeedItems extends AsyncTask<String, String, String> {
  
-        // looping through all song nodes &lt;song&gt;
-        for (int i = 0; i < 7; i++) {
-            // creating new HashMap
-            HashMap<String, String> map = new HashMap<String, String>();
-            // adding each child node to HashMap key =&gt; value
-            map.put(KEY_ID, ""+i);
-            map.put(KEY_TITLE, "Judul Berita");
-            map.put(KEY_ARTIST, "Penulis" );
-            map.put(KEY_DURATION, "Tanggal" );
- 
-            // adding HashList to ArrayList
-            songsList.add(map);
+        /**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            pDialog = new ProgressDialog(CategoryFragment.this.getActivity());
+//            pDialog.setMessage("Loading recent articles...");
+//            pDialog.setIndeterminate(false);
+//            pDialog.setCancelable(false);
+//            pDialog.show();
         }
  
-        list=(ListView)v.findViewById(R.id.list_berita);
+        /**
+         * getting all recent articles and showing them in listview
+         * */
+        @Override
+        protected String doInBackground(String... args) {
+            // rss link url
+            String rss_url = args[0];
  
-        // Getting adapter by passing xml data ArrayList
-        adapter=new NewsAdapter(getActivity(), songsList);
-        list.setAdapter(adapter);
+            // list of rss items
+            rssItems = rssParser.getRSSFeedItems(rss_url);
  
-        // Click event for single list row
-        list.setOnItemClickListener(new OnItemClickListener() {
+            // updating UI from Background Thread
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    list.setAdapter(new NewsAdapter(CategoryFragment.this.getActivity(),rssItems));
+                }
+            });
+            return null;
+        }
+ 
+        /**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String args) {
+            // dismiss the dialog after getting all products
+            waitLayout.setVisibility(View.INVISIBLE);
+        }
+    }
 
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				// TODO Auto-generated method stub
-				
-			}
- 
-        });
-        
-        return v;
-	}
-    
-    
 }
