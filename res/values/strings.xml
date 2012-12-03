@@ -8,5 +8,13 @@
     <string name="category2">Beasiswa dan Lowongan</string>
     <string name="category3">Lomba dan Prestasi</string>
     <string name="category4">Santai</string>
+    <string name="category5">Umum</string>
+    <string name="category6">Komunitas Mahasiswa</string>
+    <string name="category7">Berita dari Kamu</string>
+    <string name="category8">Dari Admin</string>
+    <string name="category9">Opini</string>
+    <string name="category10">Organisasi Mahisiswa dan UKM</string>
+    <string name="category11">Pengumuman Resmi Kampus</string>
+    <string name="category12">Snapshot</string>
 
 </resources>

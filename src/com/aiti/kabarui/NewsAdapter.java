@@ -53,7 +53,7 @@ public class NewsAdapter extends BaseAdapter {
         // Setting all values in listview
         title.setText(item.getTitle());
         artist.setText(item.getCreator());
-        duration.setText(item.getFormattedDate());
+        duration.setText(item.getPubdate());
         thumb_image.setImageResource(R.drawable.ic_launcher);
         return vi;
     }

@@ -5,48 +5,51 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.viewpagerindicator.IconPagerAdapter;
 
-class TestFragmentAdapter extends FragmentPagerAdapter implements IconPagerAdapter {
-    protected static final String[] CONTENT = new String[] { "Home", "Acara Kampus", "Beasiswa", "Lomba", "Santai", };
-    protected static final int[] ICONS = new int[] {
-            R.drawable.perm_group_calendar,
-            R.drawable.perm_group_camera,
-            R.drawable.perm_group_device_alarms,
-            R.drawable.perm_group_location
-    };
+class TestFragmentAdapter extends FragmentPagerAdapter implements
+		IconPagerAdapter {
+	protected static final String[] CONTENT = new String[] { "Home", "Radio",
+			"Acara Kampus", "Beasiswa", "Lomba", "Santai", "Umum",
+			"Komunitas Mahasiswa", "Dari Kamu", "Dari Admin", "Opini",
+			"Organisasi Mahasiswa", "Pengumuman Kampus", "Snapshot" };
+	protected static final int[] ICONS = new int[] {
+			R.drawable.perm_group_calendar, R.drawable.perm_group_camera,
+			R.drawable.perm_group_device_alarms, R.drawable.perm_group_location };
 
-    private int mCount = CONTENT.length;
+	private int mCount = CONTENT.length;
 
-    public TestFragmentAdapter(FragmentManager fm) {
-        super(fm);
-    }
+	public TestFragmentAdapter(FragmentManager fm) {
+		super(fm);
+	}
 
-    @Override
-    public Fragment getItem(int position) {
-    	if(position == 0)
-    		return new HomeFragment();
-    	else
-    		return new CategoryFragment(position-1);
-    }
+	@Override
+	public Fragment getItem(int position) {
+		if (position == 0)
+			return new HomeFragment();
+		else if (position == 1)
+			return new RadioFragment();
+		else
+			return new CategoryFragment(position - 2);
+	}
 
-    @Override
-    public int getCount() {
-        return mCount;
-    }
+	@Override
+	public int getCount() {
+		return mCount;
+	}
 
-    @Override
-    public CharSequence getPageTitle(int position) {
-      return TestFragmentAdapter.CONTENT[position % CONTENT.length];
-    }
+	@Override
+	public CharSequence getPageTitle(int position) {
+		return TestFragmentAdapter.CONTENT[position % CONTENT.length];
+	}
 
-    @Override
-    public int getIconResId(int index) {
-      return ICONS[index % ICONS.length];
-    }
+	@Override
+	public int getIconResId(int index) {
+		return ICONS[index % ICONS.length];
+	}
 
-    public void setCount(int count) {
-        if (count > 0 && count <= 10) {
-            mCount = count;
-            notifyDataSetChanged();
-        }
-    }
+	public void setCount(int count) {
+		if (count > 0 && count <= 10) {
+			mCount = count;
+			notifyDataSetChanged();
+		}
+	}
 }

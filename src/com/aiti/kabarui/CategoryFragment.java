@@ -37,12 +37,28 @@ public class CategoryFragment extends Fragment {
 	public static final int CATEGORY_BEASISWA = 1;
 	public static final int CATEGORY_LOMBA = 2;
 	public static final int CATEGORY_SANTAI= 3;
+	public static final int CATEGORY_UMUM= 4;
+	public static final int CATEGORY_KOMUNITAS= 5;
+	public static final int CATEGORY_KAMU= 6;
+	public static final int CATEGORY_ADMIN= 7;
+	public static final int CATEGORY_OPINI= 8;
+	public static final int CATEGORY_ORGANISASI= 9;
+	public static final int CATEGORY_PENGUMUMAN= 10;
+	public static final int CATEGORY_SNAPSHOT= 11;
 	
 	private static final String[] ANAKUI_LINKS = {
 		"http://www.anakui.com/category/acara-kampus/feed/",
 		"http://www.anakui.com/category/beasiswa-lowongan/feed/",
 		"http://www.anakui.com/category/lomba-prestasi/feed/",
-		"http://www.anakui.com/category/santai/feed/"
+		"http://www.anakui.com/category/santai/feed/",
+		"http://www.anakui.com/category/umum/feed/",
+		"http://www.anakui.com/category/komunitas-mahasiswa/feed/",
+		"http://www.anakui.com/category/berita-dari-kamu/feed/",
+		"http://www.anakui.com/category/dari-admin/feed/",
+		"http://www.anakui.com/category/opini/feed/",
+		"http://www.anakui.com/category/organisasi-mahasiswa-ukm/feed/",
+		"http://www.anakui.com/category/pengumuman-resmi-kampus/feed",
+		"http://www.anakui.com/category/snapshot/feed"
 	};
 	private int category;
 	
