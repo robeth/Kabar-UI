@@ -28,9 +28,9 @@ public class RadioFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (state)
-					i1.setImageResource(R.drawable.ic_launcher);
+					i1.setImageResource(R.drawable.btn_radio_off);
 				else
-					i1.setImageResource(R.drawable.arrow);
+					i1.setImageResource(R.drawable.btn_radio_on);
 
 				state = !state;
 			}
