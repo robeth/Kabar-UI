@@ -1,5 +1,6 @@
 package com.aiti.kabarui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -21,6 +22,9 @@ public class KabarUI extends FragmentActivity {
 
         mIndicator = (TitlePageIndicator)findViewById(R.id.indicator);
         mIndicator.setViewPager(mPager);
+        Intent i = new Intent();
+        i.setAction("com.aiti.kabarui.start");
+        sendBroadcast(i);
     }
     
     public TestFragmentAdapter mAdapter;

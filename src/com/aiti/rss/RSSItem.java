@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import android.util.Log;
 
@@ -16,6 +17,7 @@ public class RSSItem {
 
 	// All <item> node name
 	String _title;
+	String _category;
 	String _link;
 	String _description;
 	String _pubdate;
@@ -23,15 +25,11 @@ public class RSSItem {
 	String _creator;
 	GregorianCalendar date;
 
-	// constructor
-	public RSSItem() {
-
-	}
-
 	// constructor with parameters
-	public RSSItem(String title, String link, String description,
-			String pubdate, String guid, String creator) {
+	public RSSItem(String title, String category, String link,
+			String description, String pubdate, String guid, String creator) {
 		this._title = title;
+		this._category = category;
 		this._link = link;
 		this._description = description;
 		this._pubdate = pubdate;
@@ -39,8 +37,16 @@ public class RSSItem {
 		this._creator = creator;
 
 		DateFormat formatter = new SimpleDateFormat(
-				"EEE, dd MMM yyyy HH:mm:ss zzz");
-		date = (GregorianCalendar) formatter.getCalendar();
+				"EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
+		Date d = null;
+		try {
+			d = formatter.parse(pubdate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		date = (GregorianCalendar) Calendar.getInstance();
+		date.setTime(d);
 	}
 
 	/**
@@ -105,6 +111,18 @@ public class RSSItem {
 		this.date = date;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(this._title);
+		builder.append("-");
+		builder.append(getFormattedDate());
+		builder.append("-");
+		builder.append(_pubdate);
+
+		return builder.toString();
+	}
+
 	private String getDayOfTheWeek(int i) {
 		String dayOfTheWeek = "";
 		if (i == 2) {
@@ -125,43 +143,51 @@ public class RSSItem {
 		return dayOfTheWeek;
 	}
 
+	public String getCategory() {
+		return _category;
+	}
+
+	public void setCategory(String _category) {
+		this._category = _category;
+	}
+
 	private String getDateString(int day, int month, int year) {
 		String m = "";
 		switch (month) {
-		case 1:
+		case Calendar.JANUARY:
 			m = "Januari";
 			break;
-		case 2:
+		case Calendar.FEBRUARY:
 			m = "Februari";
 			break;
-		case 3:
+		case Calendar.MARCH:
 			m = "Maret";
 			break;
-		case 4:
+		case Calendar.APRIL:
 			m = "April";
 			break;
-		case 5:
+		case Calendar.MAY:
 			m = "Mei";
 			break;
-		case 6:
+		case Calendar.JUNE:
 			m = "Juni";
 			break;
-		case 7:
+		case Calendar.JULY:
 			m = "Juli";
 			break;
-		case 8:
+		case Calendar.AUGUST:
 			m = "Agustus";
 			break;
-		case 9:
+		case Calendar.SEPTEMBER:
 			m = "September";
 			break;
-		case 10:
+		case Calendar.OCTOBER:
 			m = "Oktober";
 			break;
-		case 11:
+		case Calendar.NOVEMBER:
 			m = "November";
 			break;
-		case 12:
+		case Calendar.DECEMBER:
 			m = "Desember";
 			break;
 		}
@@ -175,6 +201,15 @@ public class RSSItem {
 				+ ", "
 				+ getDateString(getDate().get(Calendar.DAY_OF_MONTH), getDate()
 						.get(Calendar.MONTH), getDate().get(Calendar.YEAR));
+	}
+
+	public int getID() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(_title);
+		builder.append(_pubdate);
+		builder.append(_category);
+		
+		return builder.toString().hashCode();
 	}
 
 }

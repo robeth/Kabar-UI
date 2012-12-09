@@ -19,7 +19,8 @@ public class NewsActivity extends Activity {
 		String pubDate = getIntent().getStringExtra("pubdate");
 		String link = getIntent().getStringExtra("link");
 		String description = getIntent().getStringExtra("description");
-		RSSItem item = new RSSItem(title, link, description, pubDate, "",
+		String category = getIntent().getStringExtra("category");
+		RSSItem item = new RSSItem(title, category, link, description, pubDate, "",
 				creator);
 		setContentView(R.layout.news);
 

@@ -1,6 +1,9 @@
 package com.aiti.kabarui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,6 +12,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.aiti.kabarui.database.DatabaseModel;
 import com.aiti.rss.RSSFeed;
 import com.aiti.rss.RSSItem;
 import com.aiti.rss.RSSParser;
@@ -30,22 +35,21 @@ public class CategoryFragment extends Fragment {
 	RSSFeed rssFeed;
 	String rss_link;
 	ListView list;
+	DatabaseModel model;
 	RelativeLayout waitLayout;
 
-	public static final int CATEGORY_ACARA = 0;
-	public static final int CATEGORY_BEASISWA = 1;
-	public static final int CATEGORY_LOMBA = 2;
-	public static final int CATEGORY_SANTAI = 3;
-	public static final int CATEGORY_UMUM = 4;
-	public static final int CATEGORY_KOMUNITAS = 5;
-	public static final int CATEGORY_KAMU = 6;
-	public static final int CATEGORY_ADMIN = 7;
-	public static final int CATEGORY_OPINI = 8;
-	public static final int CATEGORY_ORGANISASI = 9;
-	public static final int CATEGORY_PENGUMUMAN = 10;
-	public static final int CATEGORY_SNAPSHOT = 11;
+	public static final int CATEGORY_ACARA = 0, CATEGORY_BEASISWA = 1,
+			CATEGORY_LOMBA = 2, CATEGORY_SANTAI = 3, CATEGORY_UMUM = 4,
+			CATEGORY_KOMUNITAS = 5, CATEGORY_KAMU = 6, CATEGORY_ADMIN = 7,
+			CATEGORY_OPINI = 8, CATEGORY_ORGANISASI = 9,
+			CATEGORY_PENGUMUMAN = 10, CATEGORY_SNAPSHOT = 11;
 
-	private static final String[] ANAKUI_LINKS = {
+	public static final String[] ANAKUI_CATEGORIES = { "Home", "Radio",
+			"Acara Kampus", "Beasiswa", "Lomba", "Santai", "Umum",
+			"Komunitas Mahasiswa", "Dari Kamu", "Dari Admin", "Opini",
+			"Organisasi Mahasiswa", "Pengumuman Kampus", "Snapshot" };
+
+	public static final String[] ANAKUI_LINKS = {
 			"http://www.anakui.com/category/acara-kampus/feed/",
 			"http://www.anakui.com/category/beasiswa-lowongan/feed/",
 			"http://www.anakui.com/category/lomba-prestasi/feed/",
@@ -60,10 +64,10 @@ public class CategoryFragment extends Fragment {
 			"http://www.anakui.com/category/snapshot/feed" };
 	private int category;
 
-	public CategoryFragment(){
+	public CategoryFragment() {
 		super();
 	}
-	
+
 	public CategoryFragment(int category) {
 		super();
 		this.category = category;
@@ -84,15 +88,56 @@ public class CategoryFragment extends Fragment {
 
 		list = (ListView) v.findViewById(R.id.list_berita);
 		waitLayout = (RelativeLayout) v.findViewById(R.id.wait_layout);
-		new loadRSSFeedItems().execute(rss_link);
-		// Getting adapter by passing xml data ArrayList
+
+		model = new DatabaseModel(getActivity());
+		model.open();
+		if (model.isCategoryExist(ANAKUI_CATEGORIES[category])) {
+			rssItems = model.getAllItems(ANAKUI_CATEGORIES[category]);
+			updateActivityUi();
+			// Getting adapter by passing xml data ArrayList
+		} else {
+			new FetchAsyncTask().execute(rss_link);
+		}
+
 		return v;
+	}
+
+	private void updateActivityUi() {
+		Collections.sort(rssItems, new ItemComparator());
+		getActivity().runOnUiThread(new Runnable() {
+			public void run() {
+				list.setAdapter(new NewsAdapter(CategoryFragment.this
+						.getActivity(), rssItems));
+				list.setOnItemClickListener(new OnItemClickListener() {
+
+					@Override
+					public void onItemClick(AdapterView<?> arg0, View arg1,
+							int arg2, long arg3) {
+						// TODO Auto-generated method stub
+						Intent i = new Intent(CategoryFragment.this
+								.getActivity(), NewsActivity.class);
+						i.putExtra("title", rssItems.get(arg2).getTitle());
+						i.putExtra("creator", rssItems.get(arg2).getCreator());
+						i.putExtra("pubdate", rssItems.get(arg2).getPubdate());
+						i.putExtra("link", rssItems.get(arg2).getLink());
+						i.putExtra("description", rssItems.get(arg2)
+								.getDescription());
+						i.putExtra("category", rssItems.get(arg2).getCategory());
+						CategoryFragment.this.getActivity().startActivity(i);
+					}
+
+				});
+				model.close();
+				waitLayout.setVisibility(View.INVISIBLE);
+			}
+		});
+
 	}
 
 	/**
 	 * Background Async Task to get RSS Feed Items data from URL
 	 * */
-	class loadRSSFeedItems extends AsyncTask<String, String, String> {
+	class FetchAsyncTask extends AsyncTask<String, String, String> {
 
 		/**
 		 * Before starting background thread Show Progress Dialog
@@ -117,38 +162,15 @@ public class CategoryFragment extends Fragment {
 			String rss_url = args[0];
 
 			// list of rss items
-			rssItems = rssParser.getRSSFeedItems(rss_url);
-
+			rssItems = rssParser.getRSSFeedItems(rss_url,
+					ANAKUI_CATEGORIES[category]);
+			for (int i = 0; i < rssItems.size(); i++) {
+				model.addItem(rssItems.get(i));
+			}
+			
 			// updating UI from Background Thread
 			if (getActivity() != null) {
-				getActivity().runOnUiThread(new Runnable() {
-					public void run() {
-						list.setAdapter(new NewsAdapter(CategoryFragment.this
-								.getActivity(), rssItems));
-						list.setOnItemClickListener(new OnItemClickListener() {
-
-							@Override
-							public void onItemClick(AdapterView<?> arg0,
-									View arg1, int arg2, long arg3) {
-								// TODO Auto-generated method stub
-								Intent i = new Intent(CategoryFragment.this
-										.getActivity(), NewsActivity.class);
-								i.putExtra("title", rssItems.get(arg2)
-										.getTitle());
-								i.putExtra("creator", rssItems.get(arg2)
-										.getCreator());
-								i.putExtra("pubdate", rssItems.get(arg2)
-										.getPubdate());
-								i.putExtra("link", rssItems.get(arg2).getLink());
-								i.putExtra("description", rssItems.get(arg2)
-										.getDescription());
-								CategoryFragment.this.getActivity()
-										.startActivity(i);
-							}
-
-						});
-					}
-				});
+				updateActivityUi();
 			}
 			return null;
 		}
@@ -159,6 +181,14 @@ public class CategoryFragment extends Fragment {
 		protected void onPostExecute(String args) {
 			// dismiss the dialog after getting all products
 			waitLayout.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	private class ItemComparator implements Comparator<RSSItem> {
+
+		@Override
+		public int compare(RSSItem lhs, RSSItem rhs) {
+			return -1 * lhs.getDate().compareTo(rhs.getDate());
 		}
 	}
 

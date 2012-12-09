@@ -7,7 +7,7 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="16" />
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -24,7 +24,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.aiti.kabarui.NewsActivity" android:label="Berita" />
+        <activity
+            android:name="com.aiti.kabarui.NewsActivity"
+            android:label="Berita" />
+
+        <service
+            android:name="com.aiti.kabarui.autofetch.FetchService"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name" >
+        </service>
+
+        <receiver android:name="com.aiti.kabarui.autofetch.OnBootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.aiti.kabarui.start" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -99,7 +99,7 @@ public class RSSParser {
 	 * @param - rss link url of the website
 	 * @return - List of RSSItem class objects
 	 * */
-	public List<RSSItem> getRSSFeedItems(String rss_url){
+	public List<RSSItem> getRSSFeedItems(String rss_url,String category){
 		List<RSSItem> itemsList = new ArrayList<RSSItem>();
 		String rss_feed_xml;
 		
@@ -129,7 +129,7 @@ public class RSSParser {
 					String guid = this.getValue(e1, TAG_GUID);
 					String creator = this.getValue(e1, TAG_CREATOR);
 					
-					RSSItem rssItem = new RSSItem(title, link, description, pubdate, guid, creator);
+					RSSItem rssItem = new RSSItem(title, category, link, description, pubdate, guid, creator);
 					
 					// adding item to list
 					itemsList.add(rssItem);
