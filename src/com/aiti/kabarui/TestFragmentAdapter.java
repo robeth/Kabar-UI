@@ -3,11 +3,13 @@ package com.aiti.kabarui;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+
 import com.viewpagerindicator.IconPagerAdapter;
 
 class TestFragmentAdapter extends FragmentPagerAdapter implements
 		IconPagerAdapter {
-	protected static final String[] CONTENT = new String[] { "Home", "Radio",
+	protected static final String[] CONTENT = new String[] { "Home",
 			"Acara Kampus", "Beasiswa", "Lomba", "Santai", "Umum",
 			"Komunitas Mahasiswa", "Dari Kamu", "Dari Admin", "Opini",
 			"Organisasi Mahasiswa", "Pengumuman Kampus", "Snapshot" };
@@ -16,19 +18,19 @@ class TestFragmentAdapter extends FragmentPagerAdapter implements
 			R.drawable.perm_group_device_alarms, R.drawable.perm_group_location };
 
 	private int mCount = CONTENT.length;
+	private ViewPager mPager;
 
-	public TestFragmentAdapter(FragmentManager fm) {
+	public TestFragmentAdapter(FragmentManager fm, ViewPager mPager) {
 		super(fm);
+		this.mPager = mPager;
 	}
 
 	@Override
 	public Fragment getItem(int position) {
 		if (position == 0)
-			return new HomeFragment();
-		else if (position == 1)
-			return new RadioFragment();
+			return new HomeFragment(mPager);
 		else
-			return new CategoryFragment(position - 2);
+			return new CategoryFragment(position - 1);
 	}
 
 	@Override

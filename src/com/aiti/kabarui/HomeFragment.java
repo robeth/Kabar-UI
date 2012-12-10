@@ -1,22 +1,24 @@
 package com.aiti.kabarui;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class HomeFragment extends Fragment {
-	KabarUI activity;
 	TextView[] tvs = new TextView[12];
+	ViewPager mPager;
+	public HomeFragment(ViewPager mPager){
+		super();
+		this.mPager = mPager;
+	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		activity = (KabarUI)getActivity();
 	}
 	
 
@@ -39,7 +41,7 @@ public class HomeFragment extends Fragment {
 		tvs[11] = (TextView) v.findViewById(R.id.category12);
 		
 		for(int i = 0; i < 12; i++){
-			tvs[i].setOnClickListener(getListener(i+2));
+			tvs[i].setOnClickListener(getListener(i+1));
 		}
 
 		// TODO Auto-generated method stub
@@ -53,7 +55,7 @@ public class HomeFragment extends Fragment {
 			
 			@Override
 			public void onClick(View v) {
-				activity.mPager.setCurrentItem(pageNumber);
+				mPager.setCurrentItem(pageNumber);
 			}
 		};
 		return clickListener;
