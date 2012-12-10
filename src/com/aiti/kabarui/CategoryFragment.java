@@ -28,7 +28,6 @@ import com.aiti.rss.RSSParser;
 
 public class CategoryFragment extends Fragment {
 
-	private ProgressDialog pDialog;
 	ArrayList<HashMap<String, String>> rssItemList = new ArrayList<HashMap<String, String>>();
 	RSSParser rssParser = new RSSParser();
 	List<RSSItem> rssItems = new ArrayList<RSSItem>();

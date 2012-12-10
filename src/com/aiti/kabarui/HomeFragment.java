@@ -11,6 +11,10 @@ import android.widget.TextView;
 public class HomeFragment extends Fragment {
 	TextView[] tvs = new TextView[12];
 	ViewPager mPager;
+	
+	public HomeFragment(){
+		super();
+	}
 	public HomeFragment(ViewPager mPager){
 		super();
 		this.mPager = mPager;

@@ -33,7 +33,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
            
-            android:src="@drawable/btn_radio_on" />
+            android:src="@drawable/btn_radio_off" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
                 android:textColor="#FFA500" />
 
             <SeekBar
-                android:id="@+id/seekBar1"
+                android:id="@+id/volumeBar"
                 android:layout_width="match_parent"
                 android:layout_height="15dp"
                 android:layout_weight="0.25"

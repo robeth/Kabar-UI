@@ -25,7 +25,9 @@ public class AnakUI extends Fragment {
 		mPager = (ViewPager) v.findViewById(R.id.pager);
 		mAdapter = new TestFragmentAdapter(getActivity()
 				.getSupportFragmentManager(), mPager);
-
+		mPager.setAdapter(mAdapter);
+		mIndicator = (TitlePageIndicator) v.findViewById(R.id.indicator);
+		mIndicator.setViewPager(mPager);
 		new setAdapterTask().execute();
 
 		Intent i = new Intent();
@@ -41,9 +43,7 @@ public class AnakUI extends Fragment {
 
 		@Override
 		protected void onPostExecute(Void result) {
-			mPager.setAdapter(mAdapter);
-			mIndicator = (TitlePageIndicator) v.findViewById(R.id.indicator);
-			mIndicator.setViewPager(mPager);
+			
 		}
 	}
 

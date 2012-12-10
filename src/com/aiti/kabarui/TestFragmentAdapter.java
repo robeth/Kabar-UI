@@ -2,12 +2,12 @@ package com.aiti.kabarui;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import com.viewpagerindicator.IconPagerAdapter;
 
-class TestFragmentAdapter extends FragmentPagerAdapter implements
+class TestFragmentAdapter extends FragmentStatePagerAdapter implements
 		IconPagerAdapter {
 	protected static final String[] CONTENT = new String[] { "Home",
 			"Acara Kampus", "Beasiswa", "Lomba", "Santai", "Umum",
