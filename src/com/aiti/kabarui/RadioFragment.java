@@ -1,11 +1,14 @@
 package com.aiti.kabarui;
 
+import java.io.IOException;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,50 +16,34 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 public class RadioFragment extends Fragment {
 	public static final String LINK_RADIO_EX = "http://liveradio.masima.co.id:8000/prambors";
-	public static final String LINK_RADIO_EX2 = "rtmp://152.118.147.2/rtplive'";
-	
-	private View root;
-	boolean isPlaying = false;
-	MediaPlayer mpObj = null;
-	String current = LINK_RADIO_EX;
-	ImageView i1, i2;
-	private OnClickListener imageOnClickListener;
+	public static final String LINK_RADIO_EX2 = "rtmp://152.118.147.2/rtplive";
+
+	private boolean isPlaying = false;
+	private String current = LINK_RADIO_EX;
+
+	private MediaPlayer mpObj = null;
+	private ImageView i1;
+	private OnListener onListener;
+	private RadioAsyncTask asyntask;
+	private RelativeLayout waitLayout;
+	private SeekBar bar;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.radiortc, container, false);
 
-		root = v;
 		i1 = (ImageView) v.findViewById(R.id.im1);
-		imageOnClickListener = new OnClickListener() {
-			boolean state = false;
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if (state) {
-					i1.setImageResource(R.drawable.btn_radio_off);
-					mpObj.stop();
-					isPlaying = false;
-				} else {
-					i1.setImageResource(R.drawable.btn_radio_on);
-					try {
-						setMethodSatu();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				state = !state;
-			}
-		};
-		i1.setOnClickListener(imageOnClickListener);
+		waitLayout = (RelativeLayout) v.findViewById(R.id.wait_layout);
+		bar = (SeekBar) v.findViewById(R.id.volumeBar);
+		onListener = new OnListener();
+		i1.setOnClickListener(onListener);
 
 		setVolumeBar();
 		return v;
@@ -68,47 +55,34 @@ public class RadioFragment extends Fragment {
 		int maxVolume = audioManager
 				.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		int curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-		SeekBar volControl = (SeekBar) root.findViewById(R.id.volumeBar);
 
-		volControl.setMax(maxVolume);
-		volControl.setProgress(curVolume);
+		bar.setMax(maxVolume);
+		bar.setProgress(curVolume);
 
-		volControl
-				.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-					@Override
-					public void onStopTrackingTouch(SeekBar arg0) {
-					}
+		bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar arg0) {
+			}
 
-					@Override
-					public void onStartTrackingTouch(SeekBar arg0) {
-					}
+			@Override
+			public void onStartTrackingTouch(SeekBar arg0) {
+			}
 
-					@Override
-					public void onProgressChanged(SeekBar arg0, int arg1,
-							boolean arg2) {
-						audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-								arg1, 0);
-					}
-				});
+			@Override
+			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+				audioManager
+						.setStreamVolume(AudioManager.STREAM_MUSIC, arg1, 0);
+			}
+		});
 	}
 
-
-	private void setMethodSatu() throws Exception {
-
-		if (isPlaying) {
-			Toast.makeText(RadioFragment.this.getActivity(), "Radio sedang terputar",
-					Toast.LENGTH_SHORT).show();
-			return;
-		}
+	private void setMethodSatu() throws IllegalArgumentException,
+			SecurityException, IllegalStateException, IOException {
 
 		AudioManager amanager = (AudioManager) this.getActivity()
 				.getSystemService(Context.AUDIO_SERVICE);
 		int maxVolume = amanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		amanager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0); // set
-																			// suara
-																			// ke
-																			// max
-																			// :p
+		amanager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
 
 		mpObj = new MediaPlayer();
 		mpObj.setDataSource(current);
@@ -137,28 +111,15 @@ public class RadioFragment extends Fragment {
 				sb.append('\n');
 
 				System.out.println(sb.toString());
+				finishLoading(false, sb.toString());
 				return true;
 			}
 		});
 
-		final ProgressDialog anu = new ProgressDialog(this.getActivity());
-		anu.setCancelable(true);
-		anu.setTitle("Layar Tunggu");
-		anu.setMessage("Menyiapkan radio...");
-		anu.show();
-		anu.setOnCancelListener(new OnCancelListener() {
-			
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				// TODO Auto-generated method stub
-				mpObj.stop();
-				imageOnClickListener.onClick(null);
-			}
-		});
 		mpObj.prepareAsync();
 		mpObj.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 			public void onPrepared(MediaPlayer mp) {
-				anu.dismiss();
+				finishLoading(true, "Sukses Load RTC UI");
 				mp.start();
 				isPlaying = true;
 
@@ -169,6 +130,96 @@ public class RadioFragment extends Fragment {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+	}
+
+	private void finishLoading (boolean isSuccess, String message){
+		waitLayout.setVisibility(View.INVISIBLE);
+		if(isSuccess){
+			isPlaying = true;
+			i1.setImageResource(R.drawable.btn_radio_on);
+			onListener.state = true;
+		} else {
+			isPlaying = false;
+			i1.setImageResource(R.drawable.btn_radio_off);
+			onListener.state = false;
+		}
+		i1.setOnClickListener(onListener);
+		Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+	}
+
+	class RadioAsyncTask extends AsyncTask<String, String, String> {
+		private boolean isException = false;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
+
+		@Override
+		protected String doInBackground(String... args) {
+			isException = false;
+			String errorMessage = "";
+			try {
+				setMethodSatu();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				errorMessage = e.getMessage();
+				isException = true;
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				errorMessage = e.getMessage();
+				e.printStackTrace();
+				isException = true;
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				errorMessage = e.getMessage();
+				e.printStackTrace();
+				isException = true;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				errorMessage = e.getMessage();
+				e.printStackTrace();
+				isException = true;
+			}
+
+			if (isException)
+				finishLoading(false, errorMessage);
+
+			return null;
+		}
+
+		protected void onPostExecute(String args) {
+
+		}
+	}
+
+	private class OnListener implements OnClickListener {
+		boolean state = false;
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			if (state) {
+				mpObj.stop();
+				isPlaying = false;
+				if (!asyntask.isCancelled())
+					asyntask.cancel(true);
+				i1.setImageResource(R.drawable.btn_radio_off);
+			} else {
+				waitLayout.setVisibility(View.VISIBLE);
+				i1.setOnClickListener(null);
+				try {
+					asyntask = new RadioAsyncTask();
+					asyntask.execute("");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			state = !state;
+		}
 
 	}
 

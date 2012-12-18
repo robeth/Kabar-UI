@@ -1,13 +1,11 @@
 package com.aiti.kabarui;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
-import com.aiti.rss.RSSItem;
-
 import android.app.Activity;
 import android.os.Bundle;
+import android.webkit.WebView;
 import android.widget.TextView;
+
+import com.aiti.rss.RSSItem;
 
 public class NewsActivity extends Activity {
 
@@ -25,15 +23,18 @@ public class NewsActivity extends Activity {
 		setContentView(R.layout.news);
 
 		TextView tvTitle, tvCreator, tvPubDate, tvDescription;
+		WebView wv;
 		tvTitle = (TextView) findViewById(R.id.news_title);
 		tvCreator = (TextView) findViewById(R.id.news_writer);
 		tvPubDate = (TextView) findViewById(R.id.news_pubdate);
 		tvDescription = (TextView) findViewById(R.id.news_description);
+		wv = (WebView) findViewById(R.id.webview);
 
 		tvTitle.setText(title);
 		tvCreator.setText(creator);
 		tvPubDate.setText(item.getFormattedDate());
 		tvDescription.setText(description);
+		wv.loadUrl(item.getLink());
 	}
 
 	

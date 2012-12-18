@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TabHost
+    <com.aiti.kabarui.experiment.ReclickableTabHost
         android:id="@android:id/tabhost"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" >
@@ -38,6 +38,6 @@
                 android:layout_weight="0"
                 android:orientation="horizontal" />
         </LinearLayout>
-    </TabHost>
+    </com.aiti.kabarui.experiment.ReclickableTabHost>
 
 </LinearLayout>

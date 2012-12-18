@@ -1,10 +1,14 @@
 package com.aiti.kabarui;
 
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +16,21 @@ import android.view.ViewGroup;
 import com.viewpagerindicator.PageIndicator;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class AnakUI extends Fragment {
+public class AnakUI extends Fragment implements SensorEventListener {
 	public TestFragmentAdapter mAdapter;
 	public ViewPager mPager;
 	public PageIndicator mIndicator;
-	View v;
+	private View v;
+	private float mLastX, mLastY, mLastZ;
+	private static final float thresX = 2,
+			resetX =0.5f;
+	private boolean hasReset = true, isNext = false;
+	private boolean mInitialized;
+	private SensorManager mSensorManager;
+	private Sensor mAccelerometer;
+
+	private final float NOISE = (float) 2.0;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -28,23 +42,96 @@ public class AnakUI extends Fragment {
 		mPager.setAdapter(mAdapter);
 		mIndicator = (TitlePageIndicator) v.findViewById(R.id.indicator);
 		mIndicator.setViewPager(mPager);
-		new setAdapterTask().execute();
 
-		Intent i = new Intent();
-		i.setAction("com.aiti.kabarui.start");
-		getActivity().sendBroadcast(i);
+		mInitialized = false;
+		mSensorManager = (SensorManager) getActivity().getSystemService(
+				Context.SENSOR_SERVICE);
+		mAccelerometer = mSensorManager
+				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		mSensorManager.registerListener(this, mAccelerometer,
+				SensorManager.SENSOR_DELAY_NORMAL);
+		// Intent i = new Intent();
+		// i.setAction("com.aiti.kabarui.start");
+		// getActivity().sendBroadcast(i);
 		return v;
 	}
 
-	private class setAdapterTask extends AsyncTask<Void, Void, Void> {
-		protected Void doInBackground(Void... params) {
-			return null;
-		}
+	public void onResume() {
 
-		@Override
-		protected void onPostExecute(Void result) {
-			
-		}
+		super.onResume();
+
+		mSensorManager.registerListener(this, mAccelerometer,
+				SensorManager.SENSOR_DELAY_NORMAL);
+
 	}
 
+	public void onPause() {
+
+		super.onPause();
+
+		mSensorManager.unregisterListener(this);
+
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		// TODO Auto-generated method stub
+		float x = event.values[0];
+		float y = event.values[1];
+		float z = event.values[2];
+		if (!mInitialized) {
+			mLastX = x;
+			mLastY = y;
+			mLastZ = z;
+			mInitialized = true;
+
+		} else {
+			float deltaX = Math.abs(mLastX - x);
+			float deltaY = Math.abs(mLastY - y);
+			float deltaZ = Math.abs(mLastZ - z);
+
+			if (deltaX < NOISE)
+				deltaX = (float) 0.0;
+			if (deltaY < NOISE)
+				deltaY = (float) 0.0;
+			if (deltaZ < NOISE)
+				deltaZ = (float) 0.0;
+			mLastX = x;
+			mLastY = y;
+			mLastZ = z;
+
+		}
+		
+		if(hasReset){
+			if(x < -thresX){
+				//prev
+				int currentPageIndex = mPager.getCurrentItem(); 
+				if( currentPageIndex > 0){
+					mPager.setCurrentItem(--currentPageIndex);
+				}
+				hasReset = false;
+				isNext = false;
+			} else if ( x > thresX){
+				//next
+				int currentPageIndex = mPager.getCurrentItem(); 
+				if( currentPageIndex < mAdapter.getCount() -1 ){
+					mPager.setCurrentItem(++currentPageIndex);
+				}
+				hasReset = false;
+				isNext = true;
+			}
+		} else {
+			if( isNext && x < resetX ){
+				hasReset = true;
+			} else if (!isNext && x > -resetX){
+				hasReset = true;
+			}
+		}
+	}
 }
