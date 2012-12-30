@@ -26,8 +26,7 @@ public class FetchService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		model = new DatabaseModel(getApplicationContext());
-		model.open();
+		
 		new FetchAsyncTask().execute();
 		return Service.START_NOT_STICKY;
 	}
@@ -51,6 +50,8 @@ public class FetchService extends Service {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
+			model = new DatabaseModel(getApplicationContext());
+			model.open();
 			// pDialog = new
 			// ProgressDialog(CategoryFragment.this.getActivity());
 			// pDialog.setMessage("Loading recent articles...");
@@ -64,29 +65,42 @@ public class FetchService extends Service {
 		 * */
 		@Override
 		protected String doInBackground(String... args) {
+			int newItems = 0;
+			int newCategories = 0;
+
 			for (int i = 0; i < CategoryFragment.ANAKUI_LINKS.length; i++) {
 				Log.d("Background" + i, "Checking: "
 						+ CategoryFragment.ANAKUI_LINKS[i]);
 				rssItems = rssParser.getRSSFeedItems(
 						CategoryFragment.ANAKUI_LINKS[i],
 						CategoryFragment.ANAKUI_CATEGORIES[i]);
+				boolean categoryUpdated = false;
+
 				for (int j = 0; j < rssItems.size(); j++) {
-					if (!model.isItemExist(rssItems.get(j).getID()))
+					if (!model.isItemExist(rssItems.get(j).getID())) {
 						model.addItem(rssItems.get(j));
+						if (!categoryUpdated){
+							newCategories++;
+							categoryUpdated = true;
+						}
+						newItems++;
+					}
 				}
 				Log.d("Background" + i, "Finished");
 			}
-			int updatedArticle = model.getUpdatedArticle();
-			int updatedCategory = 1;
+			// int updatedArticle = model.getUpdatedArticle();
+			// int updatedCategory = 1;
 			GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
-			KabarUINotification.createNotification(
-					FetchService.this,
-					updatedArticle,
-					updatedCategory,
-					g.get(Calendar.DAY_OF_MONTH) + "-" + g.get(Calendar.MONTH)
-							+ " " + g.get(Calendar.HOUR_OF_DAY) + ":"
-							+ g.get(Calendar.MINUTE));
-			model.close();
+			if (newItems > 0) {
+				KabarUINotification.createNotification(
+						FetchService.this,
+						newItems,
+						newCategories,
+						g.get(Calendar.DAY_OF_MONTH) + "-"
+								+ g.get(Calendar.MONTH) + " "
+								+ g.get(Calendar.HOUR_OF_DAY) + ":"
+								+ g.get(Calendar.MINUTE));
+			}
 
 			return null;
 		}
@@ -97,6 +111,8 @@ public class FetchService extends Service {
 		protected void onPostExecute(String args) {
 			// dismiss the dialog after getting all products
 			// waitLayout.setVisibility(View.INVISIBLE);
+
+			model.close();
 			super.onPostExecute(args);
 		}
 	}

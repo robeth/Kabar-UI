@@ -1,14 +1,16 @@
 package com.aiti.kabarui;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +24,12 @@ public class AnakUI extends Fragment implements SensorEventListener {
 	public PageIndicator mIndicator;
 	private View v;
 	private float mLastX, mLastY, mLastZ;
-	private static final float thresX = 2,
-			resetX =0.5f;
+	private static final float thresX = 2, resetX = 0.5f;
 	private boolean hasReset = true, isNext = false;
 	private boolean mInitialized;
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
+	private boolean accelerometerStatus, prevStatus;
 
 	private final float NOISE = (float) 2.0;
 
@@ -44,33 +46,39 @@ public class AnakUI extends Fragment implements SensorEventListener {
 		mIndicator.setViewPager(mPager);
 
 		mInitialized = false;
+
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(getActivity());
+		accelerometerStatus = sp.getBoolean(
+				KUIPreferencesActivity.KEY_ACCELEROMETER, true);
+
 		mSensorManager = (SensorManager) getActivity().getSystemService(
 				Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mSensorManager.registerListener(this, mAccelerometer,
-				SensorManager.SENSOR_DELAY_NORMAL);
-		// Intent i = new Intent();
-		// i.setAction("com.aiti.kabarui.start");
-		// getActivity().sendBroadcast(i);
+		
+		setAccelerometer(accelerometerStatus);
+
+		
 		return v;
 	}
 
 	public void onResume() {
 
 		super.onResume();
-
-		mSensorManager.registerListener(this, mAccelerometer,
-				SensorManager.SENSOR_DELAY_NORMAL);
+		if (accelerometerStatus) {
+			mSensorManager.registerListener(this, mAccelerometer,
+					SensorManager.SENSOR_DELAY_NORMAL);
+		}
 
 	}
 
 	public void onPause() {
 
 		super.onPause();
-
-		mSensorManager.unregisterListener(this);
-
+		if(accelerometerStatus){
+			mSensorManager.unregisterListener(this);
+		}
 	}
 
 	@Override
@@ -107,31 +115,42 @@ public class AnakUI extends Fragment implements SensorEventListener {
 			mLastZ = z;
 
 		}
-		
-		if(hasReset){
-			if(x < -thresX){
-				//prev
-				int currentPageIndex = mPager.getCurrentItem(); 
-				if( currentPageIndex > 0){
+
+		if (hasReset) {
+			if (x < -thresX) {
+				// prev
+				int currentPageIndex = mPager.getCurrentItem();
+				if (currentPageIndex > 0) {
 					mPager.setCurrentItem(--currentPageIndex);
 				}
 				hasReset = false;
 				isNext = false;
-			} else if ( x > thresX){
-				//next
-				int currentPageIndex = mPager.getCurrentItem(); 
-				if( currentPageIndex < mAdapter.getCount() -1 ){
+			} else if (x > thresX) {
+				// next
+				int currentPageIndex = mPager.getCurrentItem();
+				if (currentPageIndex < mAdapter.getCount() - 1) {
 					mPager.setCurrentItem(++currentPageIndex);
 				}
 				hasReset = false;
 				isNext = true;
 			}
 		} else {
-			if( isNext && x < resetX ){
+			if (isNext && x < resetX) {
 				hasReset = true;
-			} else if (!isNext && x > -resetX){
+			} else if (!isNext && x > -resetX) {
 				hasReset = true;
 			}
 		}
+	}
+
+	public void setAccelerometer(boolean isAccelerometer) {
+		// TODO Auto-generated method stub
+		accelerometerStatus = isAccelerometer;
+		if (accelerometerStatus)
+			mSensorManager.registerListener(this, mAccelerometer,
+					SensorManager.SENSOR_DELAY_NORMAL);
+		else
+			mSensorManager.unregisterListener(this);
+
 	}
 }

@@ -1,0 +1,30 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/pref_header_sync" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_key_auto_sync"
+            android:summary="@string/pref_summary_sync"
+            android:title="@string/pref_content_sync" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_sensor" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_key_accelerometer"
+            android:summary="@string/pref_summary_accelerometer"
+            android:title="@string/pref_content_accelerometer" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_key_audio"
+            android:summary="@string/pref_summary_audio"
+            android:title="@string/pref_content_audio" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Experimental Feature" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_key_exp"
+            android:summary="Access www.ui.ac.id as News and Prambors FM as Radio"
+            android:title="Link" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

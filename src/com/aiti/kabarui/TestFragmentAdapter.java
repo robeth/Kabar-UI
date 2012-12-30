@@ -19,10 +19,12 @@ class TestFragmentAdapter extends FragmentStatePagerAdapter implements
 
 	private int mCount = CONTENT.length;
 	private ViewPager mPager;
+	private FragmentManager mFragmentManager;
 
 	public TestFragmentAdapter(FragmentManager fm, ViewPager mPager) {
 		super(fm);
 		this.mPager = mPager;
+		this.mFragmentManager = fm;
 	}
 
 	@Override
@@ -53,5 +55,14 @@ class TestFragmentAdapter extends FragmentStatePagerAdapter implements
 			mCount = count;
 			notifyDataSetChanged();
 		}
+	}
+
+	public Fragment getActiveFragment(ViewPager container, int position) {
+		String name = makeFragmentName(container.getId(), position);
+		return mFragmentManager.findFragmentByTag(name);
+	}
+
+	private static String makeFragmentName(int viewId, int index) {
+		return "android:switcher:" + viewId + ":" + index;
 	}
 }

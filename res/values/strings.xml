@@ -16,5 +16,16 @@
     <string name="category10">Organisasi Mahisiswa dan UKM</string>
     <string name="category11">Pengumuman Resmi Kampus</string>
     <string name="category12">Snapshot</string>
+    <string name="pref_header_sync">Synchronization</string>
+    <string name="pref_content_sync">Auto-Synchroniztion</string>
+    <string name="pref_summary_sync">When activated, application will fetch new update automatically  from anakui.com</string>
+    <string name="pref_header_sensor">Sensor</string>
+    <string name="pref_content_accelerometer">Accelerometer</string>
+    <string name="pref_summary_accelerometer">Enable accelerometer to browse news category</string>
+    <string name="pref_content_audio">Speech Recognition</string>
+    <string name="pref_summary_audio">Add speech recognition item in menu to browse news category</string>
+    <string name="menuitem_audio">Search</string>
+    <string name="menuitem_sync">Sync Now</string>
+    <string name="menuitem_setting">Setting</string>
 
 </resources>

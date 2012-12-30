@@ -14,7 +14,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Theme.Sherlock" >
         <activity
             android:name="com.aiti.kabarui.KabarUI"
             android:label="@string/app_name" >
@@ -26,7 +26,10 @@
         </activity>
         <activity
             android:name="com.aiti.kabarui.NewsActivity"
-            android:label="Berita" />
+            android:label="News" />
+        <activity
+            android:name="com.aiti.kabarui.KUIPreferencesActivity"
+            android:label="Setting" />
 
         <service
             android:name="com.aiti.kabarui.autofetch.FetchService"

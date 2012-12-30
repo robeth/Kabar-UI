@@ -2,14 +2,13 @@ package com.aiti.kabarui;
 
 import java.io.IOException;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,7 @@ public class RadioFragment extends Fragment {
 	public static final String LINK_RADIO_EX2 = "rtmp://152.118.147.2/rtplive";
 
 	private boolean isPlaying = false;
-	private String current = LINK_RADIO_EX;
+	private String current = LINK_RADIO_EX2;
 
 	private MediaPlayer mpObj = null;
 	private ImageView i1;
@@ -46,6 +45,8 @@ public class RadioFragment extends Fragment {
 		i1.setOnClickListener(onListener);
 
 		setVolumeBar();
+		
+		
 		return v;
 	}
 
@@ -90,27 +91,21 @@ public class RadioFragment extends Fragment {
 		mpObj.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 			public boolean onError(MediaPlayer mp, int what, int extra) {
 				StringBuilder sb = new StringBuilder();
-				sb.append("error: ");
+				sb.append("");
 				switch (what) {
 				case MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK:
-					sb.append("ga cocok buat progressive");
+					sb.append("Streaming port is not ready");
 					break;
 				case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-					sb.append("Server Die");
+					sb.append("Cannot reach server at the moment");
 					break;
 				case MediaPlayer.MEDIA_ERROR_UNKNOWN:
-					sb.append("Geje");
+					sb.append("No active channel available right now");
 					break;
 				default:
-					sb.append(" Sesuatu : Error COde(");
-					sb.append(what);
-					sb.append(")");
+					sb.append("");
 				}
-				sb.append(" (" + what + ") ");
-				sb.append(extra);
-				sb.append('\n');
 
-				System.out.println(sb.toString());
 				finishLoading(false, sb.toString());
 				return true;
 			}
@@ -119,7 +114,7 @@ public class RadioFragment extends Fragment {
 		mpObj.prepareAsync();
 		mpObj.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 			public void onPrepared(MediaPlayer mp) {
-				finishLoading(true, "Sukses Load RTC UI");
+				finishLoading(true, "Sukses Load:"+current);
 				mp.start();
 				isPlaying = true;
 
@@ -209,6 +204,11 @@ public class RadioFragment extends Fragment {
 				i1.setImageResource(R.drawable.btn_radio_off);
 			} else {
 				waitLayout.setVisibility(View.VISIBLE);
+				SharedPreferences sp = PreferenceManager
+						.getDefaultSharedPreferences(getActivity());
+				boolean isExperimental = sp.getBoolean(
+						"pref_key_exp", true);
+				current = isExperimental? LINK_RADIO_EX :LINK_RADIO_EX2;
 				i1.setOnClickListener(null);
 				try {
 					asyntask = new RadioAsyncTask();

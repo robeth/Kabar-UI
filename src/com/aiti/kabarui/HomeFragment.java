@@ -14,11 +14,11 @@ public class HomeFragment extends Fragment {
 	TextView[] tvs = new TextView[12];
 	ViewPager mPager;
 	private static final int[] BG = { R.drawable.bitmap_acara,
-			R.drawable.bitmap_beasiswa, R.drawable.bitmap_acara,
-			R.drawable.bitmap_santai, R.drawable.bitmap_acara,
+			R.drawable.bitmap_beasiswa, R.drawable.bitmap_lomba,
+			R.drawable.bitmap_santai, R.drawable.bitmap_umum,
 			R.drawable.bitmap_komunitas, R.drawable.bitmap_acara,
-			R.drawable.bitmap_admin, R.drawable.bitmap_acara,
-			R.drawable.bitmap_acara, R.drawable.bitmap_acara,
+			R.drawable.bitmap_admin, R.drawable.bitmap_opinion,
+			R.drawable.bitmap_organisasi, R.drawable.bitmap_announcement,
 			R.drawable.bitmap_snapshot };
 
 	public HomeFragment() {

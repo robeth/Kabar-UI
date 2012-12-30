@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,21 @@ public class CategoryFragment extends Fragment {
 			"http://www.anakui.com/category/organisasi-mahasiswa-ukm/feed/",
 			"http://www.anakui.com/category/pengumuman-resmi-kampus/feed",
 			"http://www.anakui.com/category/snapshot/feed" };
+	
+	public static final String[][] ANAKUI_SUARA = {
+		{"acara", "acera", "acer"},
+		{"beasiswa", "bea siswa", "siswa", "lowongan"},
+		{"lomba", "lobak", "domba", "prestasi", "presentasi"},
+		{"santai", "pantai", "rantai", "sampai"},
+		{"gunung", "umum", "ungu","humor"},
+		{"komunitas", "kumunitas", "comunitas"},
+		{"kamu","rabu","tamu"},
+		{"admin", "aku min", "atmin"},
+		{"opini", "opi ini", "tapi ini"},
+		{"organisasi", "organisai", "kain", "bkn", "ukm", "buka", "mahasiswa"},
+		{"pengumuman"},
+		{"dahsyat", "search", "snapshot", "sex", "cheat", "get short", "snack shop", "free shots", "free short"}
+	};
 	private int category;
 
 	public CategoryFragment() {
@@ -97,13 +113,25 @@ public class CategoryFragment extends Fragment {
 
 		return v;
 	}
+	
+	public void SynchNow(){
+		Log.d("Synch now", "from heaven");
+		new FetchAsyncTask().execute(rss_link);
+	}
 
 	private void updateActivityUi() {
+		
 		Collections.sort(rssItems, new ItemComparator());
 		getActivity().runOnUiThread(new Runnable() {
 			public void run() {
-				list.setAdapter(new NewsAdapter(CategoryFragment.this
-						.getActivity(), rssItems));
+				NewsAdapter oldItems = (NewsAdapter)list.getAdapter();
+				if(oldItems == null){
+					oldItems = new NewsAdapter(CategoryFragment.this
+							.getActivity(), rssItems);
+				} else {
+					oldItems.getData().addAll(rssItems);
+				}
+				list.setAdapter(oldItems);
 				list.setOnItemClickListener(new OnItemClickListener() {
 
 					@Override
@@ -147,6 +175,7 @@ public class CategoryFragment extends Fragment {
 			// pDialog.setIndeterminate(false);
 			// pDialog.setCancelable(false);
 			// pDialog.show();
+			waitLayout.setVisibility(View.VISIBLE);
 		}
 
 		/**
@@ -161,7 +190,9 @@ public class CategoryFragment extends Fragment {
 			rssItems = rssParser.getRSSFeedItems(rss_url,
 					ANAKUI_CATEGORIES[category]);
 			for (int i = 0; i < rssItems.size(); i++) {
-				model.addItem(rssItems.get(i));
+				if (!model.isItemExist(rssItems.get(i).getID())) {
+					model.addItem(rssItems.get(i));
+				}
 			}
 			
 			// updating UI from Background Thread

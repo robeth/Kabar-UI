@@ -5,5 +5,4 @@
           android:layout_height="wrap_content"
           android:gravity="center_horizontal"
           android:clickable="true"
-          android:background="@drawable/tab_item_bg_color"
           android:contentDescription="This is image of selected media"/>

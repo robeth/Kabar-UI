@@ -25,8 +25,22 @@ public class NewsAdapter extends BaseAdapter {
         data=d;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
+    
+    
  
-    public int getCount() {
+    public List<RSSItem> getData() {
+		return data;
+	}
+
+
+
+	public void setData(List<RSSItem> data) {
+		this.data = data;
+	}
+
+
+
+	public int getCount() {
         return data.size();
     }
  
